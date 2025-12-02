@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recycling App PWA</title>
+    
+    <!-- PWA-Komponenten HINZUGEFÜGT -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Lade Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .app-store-button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        .app-store-button:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Haupt-Container, der eine mobile App Store Ansicht simuliert -->
+    <div class="w-full max-w-sm bg-white rounded-xl p-6 shadow-2xl border border-gray-100">
+
+        <div class="flex items-center space-x-4">
+            
+            <div class="app-icon bg-green-500 rounded-xl text-white shadow-lg">
+                ♻️
+            </div>
+
+            <div class="flex-grow min-w-0">
+                <p class="text-xl font-bold text-gray-800 truncate">Recycling App Pro</p>
+                <p class="text-sm text-gray-500">Kategorie: Umwelt & Nachhaltigkeit</p>
+            </div>
+
+            <button
+                id="installButton"
+                class="app-store-button bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-full text-base whitespace-nowrap active:scale-95 transition duration-150 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-50"
+                onclick="handleInstallClick()"
+            >
+                Laden
+            </button>
+        </div>
+
+        <div class="mt-6 border-t border-gray-200 pt-4">
+            <p class="text-lg font-semibold text-gray-700 mb-2">Beschreibung</p>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                Finde die nächste Recyclingstation in deiner Nähe. Scanne Produkte, um zu erfahren, wie sie richtig entsorgt werden. Gemeinsam für eine grünere Zukunft!
+            </p>
+        </div>
+
+        <div id="messageBox" class="mt-6 hidden bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 rounded-md text-sm" role="alert">
+            <!-- Nachricht wird hier von JavaScript eingefügt -->
+        </div>
+
+    </div>
+
+    <script>
+        // PWA: Registriere den Service Worker, um die App installierbar zu machen
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').then(registration => {
+                    console.log('Service Worker erfolgreich registriert:', registration.scope);
+                    // Zeige eine Info an, dass die App installierbar ist
+                    messageBox.textContent = 'Bereit zur Installation als PWA (Progressive Web App).';
+                    messageBox.classList.remove('hidden', 'bg-green-100', 'border-green-500', 'text-green-700');
+                    messageBox.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-700');
+                }).catch(err => {
+                    console.error('Fehler bei der Service Worker Registrierung:', err);
+                });
+            });
+        }
+
+
+        // Holen Sie sich die Elemente
+        const installButton = document.getElementById('installButton');
+        const messageBox = document.getElementById('messageBox');
+        
+        // Funktion zur Nachahmung des Installations- oder Startprozesses
+        function handleInstallClick() {
+            if (installButton.disabled) return;
+
+            // --- Logik für "ÖFFNEN" ---
+            if (installButton.textContent.trim() === 'Öffnen') {
+                installButton.disabled = true;
+                messageBox.textContent = 'Die Recycling App wird gestartet. Willkommen in der App!';
+                messageBox.classList.remove('hidden', 'bg-green-100', 'border-green-500', 'text-green-700');
+                messageBox.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-700');
+
+                setTimeout(() => {
+                    installButton.disabled = false;
+                    messageBox.textContent = 'Die App ist aktiv. Du kannst sie jetzt benutzen.';
+                    messageBox.classList.replace('bg-blue-100', 'bg-green-100');
+                    messageBox.classList.replace('border-blue-500', 'border-green-500');
+                    messageBox.classList.replace('text-blue-700', 'text-green-700');
+                }, 1000); 
+                return;
+            }
+
+            // --- Logik für "LADEN" ---
+            
+            installButton.disabled = true;
+            installButton.textContent = 'Wird geladen...';
+            installButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'bg-blue-500', 'hover:bg-blue-600');
+            installButton.classList.add('bg-gray-400');
+            
+            messageBox.textContent = 'Der Download der Recycling App wird simuliert...';
+            messageBox.classList.remove('hidden', 'bg-green-100', 'border-green-500', 'text-green-700');
+            messageBox.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-700');
+
+            setTimeout(() => {
+                installButton.textContent = 'Öffnen';
+                installButton.classList.remove('bg-gray-400');
+                installButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                installButton.disabled = false;
+
+                messageBox.textContent = 'Die App wurde erfolgreich heruntergeladen und ist bereit zum Öffnen!';
+                messageBox.classList.replace('bg-blue-100', 'bg-green-100');
+                messageBox.classList.replace('border-blue-500', 'border-green-500');
+                messageBox.classList.replace('text-blue-700', 'text-green-700');
+
+            }, 2500);
+        }
+    </script>
+
+</body>
+</html>
+
