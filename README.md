@@ -1,1 +1,0 @@
-# recycling-app-pwa
